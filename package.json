@@ -1,0 +1,86 @@
+{
+  "name": "industrial-engine",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Industrial Engine - a strategic economic engine-building digital board game",
+  "author": "Matthew Joyce",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "bun ./index.html",
+    "build": "bun build ./index.html --outdir=dist --minify",
+    "preview": "bunx serve dist || npx http-server dist",
+    "test": "bun test tests/",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "balance": "bun run scripts/balance-check.ts",
+    "simulate": "bun run scripts/simulate.ts",
+    "class-affinity": "bun run scripts/class-affinity.ts",
+    "build:app": "bun run scripts/build-electron-app.ts",
+    "desktop": "bun run build:app && electron .",
+    "dist:win": "bun run build:app && electron-builder --win --x64",
+    "dist:mac": "bun run build:app && electron-builder --mac",
+    "dist:linux": "bun run build:app && electron-builder --linux",
+    "dist:steam": "bun run build:app && electron-builder --win --x64 --dir"
+  },
+  "dependencies": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "optionalDependencies": {
+    "steamworks.js": "^0.4.0"
+  },
+  "build": {
+    "appId": "com.matthewjoyce.industrialengine",
+    "productName": "Industrial Engine",
+    "copyright": "Copyright © 2026 Matthew Joyce",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "app/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "steam_appid.txt",
+        "to": "../steam_appid.txt"
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/steamworks.js/**"
+    ],
+    "win": {
+      "target": [
+        "dir",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dir"
+      ],
+      "category": "public.app-category.board-games"
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ],
+      "category": "Game"
+    }
+  }
+}

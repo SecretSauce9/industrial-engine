@@ -1,0 +1,6 @@
+# Normalize line endings so the repo stays consistent across Windows/mac/Linux.
+* text=auto eol=lf
+
+# Treat the vendored standalone build and lockfile as-is.
+industrial-engine-standalone_2.html text eol=lf
+bun.lock text eol=lf

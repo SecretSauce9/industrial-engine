@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Source art for the desktop/Steam app icon. Convert to build/icon.png
+       (512x512) and build/icon.ico for packaging — see STEAM.md. -->
+  <rect width="512" height="512" rx="96" fill="#1d2733"/>
+  <path d="M128 352V224l80 64v-64l80 64v-64l96 80v48z" fill="#e8b44c"/>
+  <rect x="144" y="128" width="48" height="96" fill="#7a8ca0"/>
+</svg>

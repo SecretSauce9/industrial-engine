@@ -1,0 +1,1151 @@
+/* Industrial Engine — clean industrial board-game aesthetic.
+   Dark blueprint tabletop, high-contrast tokens, strong numeric readability. */
+
+:root {
+  --bg: #131a22;
+  --bg-grid: rgba(122, 158, 196, 0.055);
+  --panel: #1d2733;
+  --panel-2: #232f3d;
+  --panel-3: #2b3949;
+  --line: #3a4a5c;
+  --line-strong: #526a80;
+  --text: #e8edf2;
+  --text-dim: #9fb0c0;
+  --text-faint: #71818f;
+  --accent: #e8b44c;
+  --accent-dim: #a97e2c;
+  --good: #6ecf8e;
+  --bad: #e7736b;
+  --info: #6db3e8;
+  --raw: #c98f4a;
+  --intermediate: #6db3e8;
+  --finished: #b48ce8;
+  --focus: #ffd975;
+  /* Player seat colors — the classic four, chosen to stay distinct on the
+     dark blueprint background and to read clearly as colored market pips. */
+  --pc1: #e8664a; /* red-orange */
+  --pc2: #4a9fe8; /* blue */
+  --pc3: #5fc97e; /* green */
+  --pc4: #e8c34a; /* gold */
+  --radius: 10px;
+  --radius-sm: 6px;
+  font-size: 15px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background:
+    linear-gradient(rgba(19, 26, 34, 0.97), rgba(19, 26, 34, 0.97)),
+    repeating-linear-gradient(0deg, var(--bg-grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(
+      90deg,
+      var(--bg-grid) 0 1px,
+      transparent 1px 28px
+    ),
+    var(--bg);
+  color: var(--text);
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    Roboto,
+    "Helvetica Neue",
+    sans-serif;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--panel-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition:
+    background 120ms,
+    border-color 120ms,
+    transform 80ms;
+}
+button:hover:not(:disabled) {
+  background: #34455a;
+  border-color: #5a7088;
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+input,
+select {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+}
+input[type="number"] {
+  width: 70px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a1508;
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #f2c563;
+  border-color: #f2c563;
+}
+.btn-danger {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.btn-sm {
+  padding: 3px 8px;
+  font-size: 0.85rem;
+}
+
+/* ---------- header ---------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-bottom: 2px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.app-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+  white-space: nowrap;
+}
+.header-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  padding: 2px 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.header-stat .label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+.header-stat .value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.header-spacer {
+  flex: 1;
+}
+.active-player-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  background: rgba(232, 180, 76, 0.12);
+  font-weight: 600;
+}
+.ai-badge {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--info);
+  color: #10202e;
+  font-weight: 700;
+}
+
+/* ---------- layout ---------- */
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) minmax(420px, 1fr) minmax(
+      260px,
+      320px
+    );
+  gap: 12px;
+  padding: 12px;
+  align-items: start;
+  flex: 1;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel > h2 {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-body {
+  padding: 10px;
+}
+
+/* ---------- resource market ---------- */
+.market-row {
+  display: grid;
+  grid-template-columns: 24px minmax(90px, 1fr) 74px auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+}
+.market-row:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.025);
+}
+.market-row.selected {
+  border-color: var(--accent);
+  background: rgba(232, 180, 76, 0.08);
+}
+.market-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.market-name .n {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.market-name .cat {
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.supply-track {
+  display: flex;
+  gap: 1.5px;
+  margin-top: 2px;
+}
+.supply-cell {
+  width: 7px;
+  height: 9px;
+  border-radius: 1.5px;
+  border: 1px solid var(--line);
+  background: transparent;
+}
+.supply-cell.filled {
+  background: var(--text-dim);
+  border-color: var(--text-dim);
+}
+.supply-cell.filled.low {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+/* Rebate pips inherit their selling player's seat color. These are placed
+   AFTER the .filled / .low rules so they win the cascade on filled cells. */
+.supply-cell.filled.pip-p1 {
+  background: var(--pc1);
+  border-color: var(--pc1);
+}
+.supply-cell.filled.pip-p2 {
+  background: var(--pc2);
+  border-color: var(--pc2);
+}
+.supply-cell.filled.pip-p3 {
+  background: var(--pc3);
+  border-color: var(--pc3);
+}
+.supply-cell.filled.pip-p4 {
+  background: var(--pc4);
+  border-color: var(--pc4);
+}
+
+/* ---------- player seat colors ---------- */
+.player-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+.player-dot.pip-p1 {
+  background: var(--pc1);
+}
+.player-dot.pip-p2 {
+  background: var(--pc2);
+}
+.player-dot.pip-p3 {
+  background: var(--pc3);
+}
+.player-dot.pip-p4 {
+  background: var(--pc4);
+}
+/* The player-overview rows carry a bold colored left edge so each seat's
+   color is unmistakable in the top-right player box. */
+.player-row-btn {
+  position: relative;
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+.player-row-btn.seat-p1 {
+  border-left-color: var(--pc1);
+}
+.player-row-btn.seat-p2 {
+  border-left-color: var(--pc2);
+}
+.player-row-btn.seat-p3 {
+  border-left-color: var(--pc3);
+}
+.player-row-btn.seat-p4 {
+  border-left-color: var(--pc4);
+}
+.player-row-btn[aria-current="true"] {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.market-prices {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  line-height: 1.25;
+}
+.market-prices .stock-label {
+  color: var(--text-faint);
+  font-size: 0.7rem;
+}
+.price-buy {
+  color: var(--bad);
+}
+.price-sell {
+  color: var(--good);
+}
+.market-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.trade-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+  background: var(--panel-2);
+}
+.trade-total {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--panel-2);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.card.ready {
+  border-color: #4d7a5e;
+}
+.card.used {
+  border-color: var(--line);
+  opacity: 0.72;
+}
+.card.used::after {
+  content: "USED";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  border: 1px solid var(--text-faint);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px 8px;
+  flex-wrap: wrap;
+}
+.card-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  min-width: 0;
+}
+.card-cost {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.card-cat {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  border: 1px solid currentColor;
+}
+.cat-production {
+  color: var(--raw);
+}
+.cat-energy {
+  color: #e8d06d;
+}
+.cat-materials {
+  color: var(--info);
+}
+.cat-agrifood {
+  color: var(--good);
+}
+.cat-manufacturing {
+  color: var(--finished);
+}
+
+.recipe-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+}
+.recipe-row.disabled {
+  opacity: 0.55;
+}
+.recipe-io {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+.recipe-arrow {
+  color: var(--text-faint);
+}
+.io-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--panel-3);
+  border: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.io-chip svg {
+  flex-shrink: 0;
+}
+.prestige-chip {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+  font-weight: 700;
+}
+.multi-chip {
+  color: var(--info);
+  border-color: var(--info);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.tableau-grid,
+.marketplace-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 8px;
+}
+/* The active tableau wraps each card in a draggable box; make that box a
+   grid item that stretches its card to fill the cell (matching PlayerViewer,
+   where the card is the grid item directly) so a row has no empty gaps. */
+.tableau-card-wrap {
+  display: flex;
+}
+.tableau-card-wrap > .card {
+  flex: 1;
+  min-width: 0;
+}
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.filter-bar button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #1a1508;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* ---------- drag-to-sell ---------- */
+.panel.sell-target {
+  outline: 2px dashed var(--accent);
+  outline-offset: -4px;
+}
+.sell-hint {
+  margin: 0;
+  padding: 6px 10px;
+  background: rgba(232, 180, 76, 0.14);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.sell-hint-blocked {
+  background: rgba(231, 115, 107, 0.14);
+  color: var(--bad);
+}
+
+/* ---------- players panel: net-worth delta + class badge ---------- */
+.player-line {
+  display: flex;
+  align-items: stretch;
+  gap: 5px;
+}
+.player-line .player-row-btn {
+  flex: 1;
+  min-width: 0;
+}
+.nw-delta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 34px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.nw-delta.up {
+  color: var(--good);
+}
+.nw-delta.down {
+  color: var(--bad);
+}
+.nw-delta.flat {
+  color: var(--text-faint);
+}
+.class-badge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--panel-3);
+  border: 1px solid var(--line-strong);
+  color: var(--info);
+  font-weight: 700;
+}
+
+/* ---------- flavor box (field guide) ---------- */
+.flavor-box .flavor-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.flavor-emoji {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.flavor-kind {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: auto;
+}
+.flavor-text {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+/* An inline text button that looks like a link (used to open the field
+   guide from a card name or facility name). */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px dotted var(--text-faint);
+}
+.link-btn:hover {
+  color: var(--focus);
+  border-bottom-color: var(--focus);
+}
+
+/* ---------- sequence-assembly facility quick-load chips ---------- */
+.seq-facilities-block {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.facility-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.facility-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background: var(--panel-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.facility-chip:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--panel-3);
+}
+.facility-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.facility-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.eq-mark {
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- record trackers ---------- */
+.tracker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.tracker-row {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  background: var(--panel-2);
+}
+.tracker-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.tracker-sub {
+  color: var(--text-faint);
+  margin: 1px 0 3px;
+}
+.tracker-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+.tracker-chip {
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-variant-numeric: tabular-nums;
+}
+.tracker-chip.leading {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.tracker-chip.unqualified {
+  opacity: 0.5;
+}
+
+/* ---------- setup modifiers ---------- */
+.modifier-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.modifier-row input {
+  margin-top: 3px;
+}
+
+/* ---------- inventory ---------- */
+.inv-group-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  margin: 8px 0 4px;
+}
+.inv-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.inv-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+.inv-token.zero {
+  opacity: 0.38;
+}
+.inv-token b {
+  font-size: 0.92rem;
+}
+
+/* ---------- log ---------- */
+.log-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 8px;
+  max-height: 46vh;
+  overflow-y: auto;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column-reverse;
+}
+.log-list li {
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.log-list li.t-round,
+.log-list li.t-game {
+  color: var(--accent);
+  font-weight: 600;
+}
+.log-list li.t-turn {
+  color: var(--info);
+}
+.log-list li.t-prestige {
+  color: var(--finished);
+  font-weight: 600;
+}
+.log-list li.t-activate {
+  color: var(--text);
+}
+.log-list li.t-buyResource,
+.log-list li.t-sellResource,
+.log-list li.t-buyCard {
+  color: var(--text-dim);
+}
+.log-list li.t-restock,
+.log-list li.t-dev {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* ---------- modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(8, 12, 17, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--line-strong, var(--line));
+  border-radius: var(--radius);
+  max-width: 860px;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.modal-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.modal-body {
+  padding: 14px 16px;
+  overflow-y: auto;
+}
+.modal-body h3 {
+  color: var(--accent);
+  font-size: 0.95rem;
+  margin: 18px 0 6px;
+}
+.modal-body h3:first-child {
+  margin-top: 0;
+}
+/* Brief tutorial overlay */
+.tutorial-modal {
+  max-width: 560px;
+}
+.tutorial-body {
+  min-height: 190px;
+}
+.tutorial-body p {
+  margin: 0 0 12px;
+}
+.tutorial-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+.tutorial-dots {
+  display: flex;
+  gap: 6px;
+}
+.tutorial-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong, var(--line));
+  transition: background 0.15s ease;
+}
+.tutorial-dots .dot-on {
+  background: var(--accent);
+}
+.modal-body p,
+.modal-body li {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.modal-body table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.82rem;
+}
+.modal-body th,
+.modal-body td {
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  text-align: left;
+}
+.modal-body th {
+  background: var(--panel-2);
+}
+
+/* ---------- setup ---------- */
+.setup-wrap {
+  max-width: 660px;
+  margin: 40px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.setup-title {
+  text-align: center;
+  color: var(--accent);
+  font-size: 2rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 10px 0 0;
+}
+.setup-sub {
+  text-align: center;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+}
+.player-row {
+  display: grid;
+  grid-template-columns: 30px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.seat-num {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.setup-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.setup-row label {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* ---------- multiplayer lobby ---------- */
+/* Lobby seat rows carry an extra control vs. the setup grid (owner + type +
+   class + remove), so widen the track template for those rows. */
+.player-row:has(.mp-seat-owner) {
+  grid-template-columns: 30px 1fr auto auto auto;
+}
+.mp-seat-owner {
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mp-members {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mp-members li {
+  padding: 4px 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.mp-chat-log {
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+/* ---------- scores ---------- */
+.score-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.score-table th,
+.score-table td {
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  text-align: right;
+}
+.score-table th:first-child,
+.score-table td:first-child {
+  text-align: left;
+}
+.score-table th {
+  background: var(--panel-2);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.score-table tr.winner td {
+  background: rgba(232, 180, 76, 0.12);
+  font-weight: 700;
+}
+
+/* ---------- toast ---------- */
+.toast-region {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toast {
+  background: #3a2224;
+  border: 1px solid var(--bad);
+  color: #ffd7d4;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.toast.info {
+  background: #1f3242;
+  border-color: var(--info);
+  color: #d7ecff;
+}
+
+/* ---------- dev panel ---------- */
+.dev-panel {
+  border-color: var(--bad);
+}
+.dev-panel > h2 {
+  color: var(--bad);
+}
+.dev-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dev-grid .row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.dev-json {
+  width: 100%;
+  min-height: 90px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- misc ---------- */
+.muted {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+.tiny {
+  color: var(--text-faint);
+  font-size: 0.72rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+.pulse {
+  animation: pulse 500ms ease-out;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(232, 180, 76, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(232, 180, 76, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1180px) {
+  .game-layout {
+    grid-template-columns: minmax(300px, 360px) 1fr;
+  }
+  .col-right {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 860px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+  .log-list {
+    max-height: 30vh;
+  }
+  .app-header {
+    gap: 8px;
+  }
+  .header-stat {
+    min-width: 54px;
+  }
+}

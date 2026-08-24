@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# Electron / Steam build output
+release/
+# Generated from src/ by scripts/build-electron-app.ts
+app/
+
+# Claude Code local/runtime state
+.claude/
